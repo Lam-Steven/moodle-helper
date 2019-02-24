@@ -1,0 +1,16 @@
+{
+  "manifest_version": 2,
+  "name": "Moodle Helper",
+  "version": "0.1",
+  "description": "Build a marcus!",
+  "permissions": ["downloads"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ],
+  "background": {
+    "scripts": ["background.js"]
+  }
+}
