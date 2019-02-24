@@ -16,13 +16,11 @@ if (isWindowOpen(anchorTag)) {
 
 }
 
-console.log(url);
-
-const courseName = document.getElementsByClassName("page-header-headings")[0]
+const baseCourseName = document.getElementsByClassName("page-header-headings")[0]
   .children[0].innerHTML;
 
+const courseName = baseCourseName.replace(/[*?"<>|\\\/:]/g, "").trim();
 chrome.runtime.sendMessage({ url: url, courseName: courseName, extension: extension });
-
 
 
 function isWindowOpen(a) {
