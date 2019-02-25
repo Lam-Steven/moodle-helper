@@ -1,21 +1,21 @@
 const BASE_PATH = "moodle-helper/";
 
 let prefix = "";
-let suffix = "";
-chrome.downloads.onDeterminingFilename.addListener((item, suggest) => {
-  const newfilename = prefix + item.filename + suffix;
-  console.log(newfilename);
-  suggest({ filename: prefix + item.filename + suffix });
-})
-
-
+let extension = "";
 
 chrome.runtime.onMessage.addListener(msg => {
-  console.log(msg.url);
   prefix = BASE_PATH + msg.courseName + "/";
-  suffix = msg.extension;
+  extension = msg.extension;
   chrome.downloads.download({
     url: msg.url
   });
 });
 
+chrome.downloads.onDeterminingFilename.addListener((item, suggest) => {
+  const suffix = hasExtension(item.fileName) ? "" : extension;
+  suggest({ filename: prefix + item.filename + suffix });
+})
+
+function hasExtension(fileName) {
+  return fileName.indexOf(".") > -1;
+}
