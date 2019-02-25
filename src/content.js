@@ -20,7 +20,7 @@ const baseCourseName = document.getElementsByClassName("page-header-headings")[0
   .children[0].innerHTML;
 
 const courseName = baseCourseName.replace(/[*?"<>|\\\/:]/g, "").trim();
-chrome.runtime.sendMessage({ url: url, courseName: courseName, extension: extension });
+chrome.runtime.sendMessage({ recipient: "popup", url: url, courseName: courseName, extension: extension });
 
 
 function isWindowOpen(a) {

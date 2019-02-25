@@ -4,11 +4,14 @@ let prefix = "";
 let extension = "";
 
 chrome.runtime.onMessage.addListener(msg => {
-  prefix = BASE_PATH + msg.courseName + "/";
-  extension = msg.extension;
-  chrome.downloads.download({
-    url: msg.url
-  });
+  if (msg.recipient == "background") {
+    console.log(msg.extension);
+    prefix = BASE_PATH + msg.courseName + "/";
+    extension = msg.extension;
+    chrome.downloads.download({
+      url: msg.url
+    });
+  }
 });
 
 chrome.downloads.onDeterminingFilename.addListener((item, suggest) => {
