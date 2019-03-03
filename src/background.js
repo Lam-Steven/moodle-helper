@@ -1,33 +1,32 @@
-const BASE_PATH = "moodle-helper/";
+const BASE_PATH = 'moodle-helper/'
 
-let prefix = "";
-let extension = "";
+let prefix = ''
+let extension = ''
 
 chrome.runtime.onMessage.addListener(msg => {
-  if (msg.recipient == "background") {
-    prefix = BASE_PATH + msg.courseName + "/";
-    if (msg.command == "one") downloadFile(msg.resource);
-    if (msg.command == "all") downloadFiles(msg.resources);
+  if (msg.recipient == 'background') {
+    prefix = BASE_PATH + msg.courseName + '/'
+    if (msg.command == 'one') downloadFile(msg.resource)
+    if (msg.command == 'all') downloadFiles(msg.resources)
   }
-});
+})
 
 chrome.downloads.onDeterminingFilename.addListener((item, suggest) => {
-  console.log(item);
-  const suffix = hasExtension(item.fileName) ? "" : extension;
-  suggest({ filename: prefix + item.filename + suffix });
-});
+  const suffix = hasExtension(item.fileName) ? '' : extension
+  suggest({ filename: prefix + item.filename + suffix })
+})
 
 function downloadFiles(resources) {
-  Array.prototype.forEach.call(resources, downloadFile);
+  Array.prototype.forEach.call(resources, downloadFile)
 }
 
 function downloadFile(resource) {
-  extension = resource.extension;
+  extension = resource.extension
   chrome.downloads.download({
-    url: resource.url
-  });
+    url: resource.url,
+  })
 }
 
 function hasExtension(fileName) {
-  return fileName.indexOf(".") > -1;
+  return fileName.indexOf('.') > -1
 }
