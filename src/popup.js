@@ -9,7 +9,7 @@ chrome.runtime.onMessage.addListener(msg => {
     document.body.appendChild(title)
     msg.resources.forEach(resource => {
       const item = document.createElement('H2')
-      item.innerHTML = resource.url
+      item.innerHTML = resource.name
       document.body.appendChild(item)
       const button = document.createElement('BUTTON')
       button.innerHTML = 'download'
