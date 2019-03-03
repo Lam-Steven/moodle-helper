@@ -6,14 +6,14 @@ let extension = "";
 chrome.runtime.onMessage.addListener(msg => {
   if (msg.recipient == "background") {
     prefix = BASE_PATH + msg.courseName + "/";
+    console.log(prefix);
     if (msg.command == "one") downloadFile(msg.resource);
     if (msg.command == "all") downloadFiles(msg.resources);
   }
 });
 
 chrome.downloads.onDeterminingFilename.addListener((item, suggest) => {
-  console.log(item);
-  const suffix = hasExtension(item.fileName) ? "" : extension;
+  const suffix = hasExtension(item.filename) ? "" : extension;
   suggest({ filename: prefix + item.filename + suffix });
 });
 
