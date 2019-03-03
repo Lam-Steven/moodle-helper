@@ -33,7 +33,7 @@ chrome.runtime.onMessage.addListener(msg => {
       chrome.runtime.sendMessage({
         recipient: "background",
         command: "all",
-        resources: resources,
+        resources: msg.resources,
         courseName: msg.courseName,
         extension: ""
       });
