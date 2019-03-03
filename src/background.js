@@ -5,12 +5,9 @@ let extension = "";
 
 chrome.runtime.onMessage.addListener(msg => {
   if (msg.recipient == "background") {
-    console.log(msg.extension);
     prefix = BASE_PATH + msg.courseName + "/";
-    extension = msg.extension;
-    chrome.downloads.download({
-      url: msg.url
-    });
+    if (msg.command == "one") downloadFile(msg.resource);
+    if (msg.command == "all") downloadFiles(msg.resources);
   }
 });
 
@@ -19,6 +16,17 @@ chrome.downloads.onDeterminingFilename.addListener((item, suggest) => {
   const suffix = hasExtension(item.fileName) ? "" : extension;
   suggest({ filename: prefix + item.filename + suffix });
 });
+
+function downloadFiles(resources) {
+  Array.prototype.forEach.call(resources, downloadFile);
+}
+
+function downloadFile(resource) {
+  extension = resource.extension;
+  chrome.downloads.download({
+    url: resource.url
+  });
+}
 
 function hasExtension(fileName) {
   return fileName.indexOf(".") > -1;
