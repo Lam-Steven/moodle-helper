@@ -4,12 +4,12 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
 
 chrome.runtime.onMessage.addListener(msg => {
   if (msg.recipient == 'popup') {
-    const title = document.createElement('h1')
+    const title = document.createElement('H1')
     title.innerHTML = msg.courseName
     document.body.appendChild(title)
     msg.resources.forEach(resource => {
-      const item = document.createElement('H2')
-      item.innerHTML = resource.url
+      const item = document.createElement('H4')
+      item.innerHTML = resource.name
       document.body.appendChild(item)
       const button = document.createElement('BUTTON')
       button.innerHTML = 'download'
