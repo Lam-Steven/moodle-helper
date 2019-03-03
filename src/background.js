@@ -15,9 +15,10 @@ chrome.runtime.onMessage.addListener(msg => {
 });
 
 chrome.downloads.onDeterminingFilename.addListener((item, suggest) => {
+  console.log(item);
   const suffix = hasExtension(item.fileName) ? "" : extension;
   suggest({ filename: prefix + item.filename + suffix });
-})
+});
 
 function hasExtension(fileName) {
   return fileName.indexOf(".") > -1;
