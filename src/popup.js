@@ -4,6 +4,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
 
 chrome.runtime.onMessage.addListener(msg => {
   if (msg.recipient == 'popup') {
+    const inputs = [];
     let counter = 0;
     const title = document.createElement('H1')
     title.innerHTML = msg.courseName
@@ -12,6 +13,18 @@ chrome.runtime.onMessage.addListener(msg => {
     const checkBoxCounter = document.createElement('H2')
     checkBoxCounter.innerHTML = 'Nombre de fichiers: ' + counter
     document.body.appendChild(checkBoxCounter)
+
+    const selectAllCheckbox = document.createElement('INPUT')
+    const selectAllCheckboxText = document.createElement('H2')
+    selectAllCheckboxText.innerHTML = 'Check all'
+    selectAllCheckboxText.style.display = 'inline'
+    selectAllCheckbox.addEventListener('change', function(){
+        selectAllCheckboxes(inputs, this.checked)       
+    })
+    
+    selectAllCheckbox.setAttribute("type", "checkbox");
+    document.body.appendChild(selectAllCheckbox)
+    document.body.appendChild(selectAllCheckboxText)
     
     const selectedRessources = [];
     msg.resources.forEach(resource => {
@@ -23,8 +36,9 @@ chrome.runtime.onMessage.addListener(msg => {
       item.innerHTML = resource.name
       item.appendChild(icon)
       document.body.appendChild(item)
-
+      
       const checkbox = document.createElement("INPUT");
+      inputs.push(checkbox);
       checkbox.addEventListener('change', function() {
         if(this.checked){
           counter += 1;
@@ -80,7 +94,18 @@ chrome.runtime.onMessage.addListener(msg => {
         extension: '',
       })
     })
+
     document.body.appendChild(document.createElement('br'))
     document.body.appendChild(downloadSelectedButton)
+    
   }
 })
+
+function selectAllCheckboxes (inputs, isChecked) {
+  inputs.forEach((element) => {
+    if(element.checked != isChecked){
+      element.checked = isChecked;
+      element.dispatchEvent(new Event('change'));
+    }
+  })
+}
