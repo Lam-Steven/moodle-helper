@@ -5,7 +5,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
 chrome.runtime.onMessage.addListener(msg => {
   if (msg.recipient == 'popup') {
     let counter = 0;
-    const title = document.createElement('h1')
+    const title = document.createElement('H1')
     title.innerHTML = msg.courseName
     document.body.appendChild(title)
 
@@ -15,8 +15,8 @@ chrome.runtime.onMessage.addListener(msg => {
     
     const selectedRessources = [];
     msg.resources.forEach(resource => {
-      const item = document.createElement('H2')
-      item.innerHTML = resource.url
+      const item = document.createElement('H4')
+      item.innerHTML = resource.name
       document.body.appendChild(item)
 
       const checkbox = document.createElement("INPUT");

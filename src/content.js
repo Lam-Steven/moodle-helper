@@ -6,6 +6,7 @@ chrome.runtime.onMessage.addListener(msg => {
     Array.prototype.forEach.call(resources, resource => {
       const anchorTag =
         resource.children[0].children[0].children[1].children[0].children[0]
+      const nameTag = anchorTag.children[1]
       let url = anchorTag.href
       let extension = ''
 
@@ -17,7 +18,11 @@ chrome.runtime.onMessage.addListener(msg => {
         url = s.substring(first, second)
       }
 
-      resourcesArray.push({ url: url, extension: extension })
+      resourcesArray.push({
+        url: url,
+        name: nameTag.innerHTML,
+        extension: extension,
+      })
     })
 
     const courseNameHTML = document.getElementsByClassName(
