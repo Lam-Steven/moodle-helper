@@ -10,13 +10,18 @@ chrome.runtime.onMessage.addListener(msg => {
     document.body.appendChild(title)
 
     const checkBoxCounter = document.createElement('H2')
-    checkBoxCounter.innerHTML = counter
+    checkBoxCounter.innerHTML = 'Nombre de fichiers: ' + counter
     document.body.appendChild(checkBoxCounter)
     
     const selectedRessources = [];
     msg.resources.forEach(resource => {
+      const icon = document.createElement('img')
+      icon.src = resource.iconUrl;
+      icon.style.display = 'block'
       const item = document.createElement('H4')
+
       item.innerHTML = resource.name
+      item.appendChild(icon)
       document.body.appendChild(item)
 
       const checkbox = document.createElement("INPUT");
@@ -30,7 +35,7 @@ chrome.runtime.onMessage.addListener(msg => {
           const index = selectedRessources.indexOf(resource);
           selectedRessources.splice(index, 1);
         }
-        checkBoxCounter.innerHTML = counter;
+        checkBoxCounter.innerHTML ='Nombre de fichiers: ' +  counter;
         console.log(selectedRessources.length);
       })
       checkbox.setAttribute("type", "checkbox");
