@@ -7,6 +7,7 @@ chrome.runtime.onMessage.addListener(msg => {
       const anchorTag =
         resource.children[0].children[0].children[1].children[0].children[0]
       const nameTag = anchorTag.children[1]
+      const iconTag = anchorTag.children[0]
       let url = anchorTag.href
       let extension = ''
 
@@ -19,6 +20,7 @@ chrome.runtime.onMessage.addListener(msg => {
       }
 
       resourcesArray.push({
+        iconUrl: iconTag.src,
         url: url,
         name: nameTag.innerHTML,
         extension: extension,
