@@ -12,7 +12,7 @@ chrome.runtime.onMessage.addListener(msg => {
 })
 
 chrome.downloads.onDeterminingFilename.addListener((item, suggest) => {
-  const suffix = hasExtension(item.fileName) ? '' : extension
+  const suffix = hasExtension(item.filename) ? '' : extension
   suggest({ filename: prefix + item.filename + suffix })
 })
 
