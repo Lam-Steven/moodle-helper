@@ -1,3 +1,5 @@
+const ILLEGAL_CHARACTERS = /[*?"<>|\\\/:]/g;
+
 chrome.runtime.onMessage.addListener(msg => {
   if (msg.recipient == 'content' && msg.start) {
     const resources = document.getElementsByClassName('activity resource')
@@ -27,15 +29,10 @@ chrome.runtime.onMessage.addListener(msg => {
       })
     })
 
-    const courseNameHTML = document.getElementsByClassName(
-      'page-header-headings'
-    )[0].children[0].innerHTML
-    const courseName = courseNameHTML.replace(/[*?"<>|\\\/:]/g, '').trim()
-
     chrome.runtime.sendMessage({
       recipient: 'popup',
       resources: resourcesArray,
-      courseName: courseName,
+      courseName: getCourseName(),
     })
   }
 })
@@ -45,4 +42,24 @@ function isWindowOpen(a) {
     a.hasAttribute('onclick') &&
     a.getAttribute('onclick').indexOf('window.open') > -1
   )
+}
+
+function getSchool() {
+  const schoolURL = document.getElementsByTagName('link')[0].getAttribute('href');
+  const end = schoolURL.indexOf(".ca") 
+  const start = schoolURL.lastIndexOf('.', end - 1) + 1
+  return schoolURL.substring(start, end)
+}
+
+function getCourseName() {
+  let courseName = '';
+  switch (getSchool()) {
+    case('polymtl') :
+      courseName = document.getElementsByClassName('page-header-headings')[0].children[0].innerHTML
+      break;
+    case('uqam') :
+      courseName = document.getElementsByClassName('titre-cours')[0].innerHTML;
+      break;
+  }
+  return courseName.replace(ILLEGAL_CHARACTERS, '').trim();
 }
