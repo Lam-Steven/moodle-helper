@@ -8,18 +8,10 @@ chrome.runtime.onMessage.addListener(msg => {
         resource.children[0].children[0].children[1].children[0].children[0]
       const nameTag = anchorTag.children[1]
       const iconTag = anchorTag.children[0]
-      let url = anchorTag.href
-
-      if (isWindowOpen(anchorTag)) {
-        const s = anchorTag.getAttribute('onclick')
-        const first = s.indexOf("'") + 1
-        const second = s.indexOf("'", first)
-        url = s.substring(first, second)
-      }
 
       resourcesArray.push({
         iconUrl: iconTag.src,
-        url: url,
+        url: isWindowOpen(anchorTag) ? getDownloadURL(anchorTag) : anchorTag.href,
         name: nameTag.innerHTML
       })
     })
@@ -42,4 +34,11 @@ function isWindowOpen(a) {
     a.hasAttribute('onclick') &&
     a.getAttribute('onclick').indexOf('window.open') > -1
   )
+}
+
+function getDownloadURL(anchorTag) {
+  const s = anchorTag.getAttribute('onclick')
+  const first = s.indexOf("'") + 1
+  const second = s.indexOf("'", first) 
+  return s.substring(first, second)
 }
