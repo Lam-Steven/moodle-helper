@@ -1,7 +1,6 @@
 const BASE_PATH = 'moodle-helper/'
 
 let prefix = ''
-let extension = ''
 
 chrome.runtime.onMessage.addListener(msg => {
   if (msg.recipient == 'background') {
@@ -13,10 +12,11 @@ chrome.runtime.onMessage.addListener(msg => {
 
 chrome.downloads.onDeterminingFilename.addListener((item, suggest) => {
   if(item.filename == "view.html") {
-    downloadFromFrame(item);
-    chrome.downloads.cancel(item.id);
+    downloadFromFrame(item)
+    chrome.downloads.cancel(item.id)
   }
-  const suffix = hasExtension(item.filename) ? '' : extension
+  const suffix = isPDF(item) && !hasExtension(item.filename) ? '.pdf' : ''
+
   suggest({ filename: prefix + item.filename + suffix })
 })
 
@@ -26,10 +26,13 @@ function downloadFiles(resources) {
 }
 
 function downloadFile(resource) {
-  extension = resource.extension
   chrome.downloads.download({
     url: resource.url,
   })
+}
+
+function isPDF(item) {
+  return item.mime == 'application/pdf'
 }
 
 function hasExtension(fileName) {
@@ -41,14 +44,14 @@ function downloadFromFrame(item) {
     return data.text();
   })
   .then( (text) => {
-    const anchor = "frame src=";
-    const offset = anchor.length + 1;
-    const first = text.indexOf(anchor, text.indexOf(anchor) + offset);
+    const anchor = "frame src="
+    const offset = anchor.length + 1
+    const first = text.indexOf(anchor, text.indexOf(anchor) + offset)
     
     if (first > -1) {
-      const second = text.indexOf("\"", first + offset);
-      const url = text.substring(first + offset, second);
-      downloadFile({extension: '.pdf', url: url});
+      const second = text.indexOf("\"", first + offset)
+      const url = text.substring(first + offset, second)
+      downloadFile({url: url})
     }
   });
 }

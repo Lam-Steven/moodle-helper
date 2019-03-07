@@ -9,10 +9,8 @@ chrome.runtime.onMessage.addListener(msg => {
       const nameTag = anchorTag.children[1]
       const iconTag = anchorTag.children[0]
       let url = anchorTag.href
-      let extension = ''
 
       if (isWindowOpen(anchorTag)) {
-        extension = '.pdf'
         const s = anchorTag.getAttribute('onclick')
         const first = s.indexOf("'") + 1
         const second = s.indexOf("'", first)
@@ -22,8 +20,7 @@ chrome.runtime.onMessage.addListener(msg => {
       resourcesArray.push({
         iconUrl: iconTag.src,
         url: url,
-        name: nameTag.innerHTML,
-        extension: extension,
+        name: nameTag.innerHTML
       })
     })
 
@@ -35,7 +32,7 @@ chrome.runtime.onMessage.addListener(msg => {
     chrome.runtime.sendMessage({
       recipient: 'popup',
       resources: resourcesArray,
-      courseName: courseName,
+      courseName: courseName
     })
   }
 })
