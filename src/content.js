@@ -2,30 +2,42 @@ const ILLEGAL_CHARACTERS = /[*?"<>|\\\/:]/g;
 
 chrome.runtime.onMessage.addListener(msg => {
   if (msg.recipient == 'content' && msg.start) {
-    const resources = document.getElementsByClassName('activity resource')
-    const resourcesArray = []
 
-    Array.prototype.forEach.call(resources, resource => {
-      const anchorTag =
-        resource.children[0].children[0].children[1].children[0].children[0]
-      const nameTag = anchorTag.children[1]
-      const iconTag = anchorTag.children[0]
+    const sections = document.getElementsByClassName('section main clearfix')
+    let allResources = [];
 
-      resourcesArray.push({
-        iconUrl: iconTag.src,
-        url: isWindowOpen(anchorTag) ? getDownloadURL(anchorTag) : anchorTag.href,
-        name: nameTag.innerHTML
-      })
+    Array.prototype.forEach.call(sections, s => {
+      if (!isHidden(s)) {
+        const resources = s.children[3].children[3].children
+        const resourcesArray = []
+
+        Array.prototype.forEach.call(resources, resource => {
+          const anchorTag = resource.children[0].children[0].children[1].children[0].children[0]
+          const nameTag = anchorTag.children[1]
+          const iconTag = anchorTag.children[0]
+          resourcesArray.push({
+            iconUrl: iconTag.src,
+            url: isWindowOpen(anchorTag) ? getDownloadURL(anchorTag) : anchorTag.href,
+            name: nameTag.innerHTML
+          })
+        })
+        allResources.push({
+          section: s.getAttribute('aria-label'),
+          resources: resourcesArray
+        })
+      }
     })
-
     chrome.runtime.sendMessage({
       recipient: 'popup',
-      resources: resourcesArray,
+      resources: allResources,
       courseName: getCourseName()
     })
   }
 })
 
+function isHidden(s) {
+  return s.getAttribute('class') == 'section main clearfix hidden'
+}
 function isWindowOpen(a) {
   return (
     a.hasAttribute('onclick') &&
