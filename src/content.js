@@ -8,7 +8,7 @@ chrome.runtime.onMessage.addListener(msg => {
 
     Array.prototype.forEach.call(sections, s => {
       if (!isHidden(s)) {
-        const resources = s.children[3].children[3].children
+        const resources = getResources(s)
         const resourcesArray = []
 
         Array.prototype.forEach.call(resources, resource => {
@@ -42,7 +42,10 @@ function isHidden(s) {
 }
 
 function isActivityResource(r) {
-  return r.getAttribute('class').includes('activity resource')
+  if (r.hasAttribute('class')) {
+    return r.getAttribute('class').includes('activity resource')
+  }
+  return false
 }
 
 function isWindowOpen(a) {
@@ -64,6 +67,15 @@ function getSchool() {
   const end = schoolURL.indexOf(".ca") 
   const start = schoolURL.lastIndexOf('.', end - 1) + 1
   return schoolURL.substring(start, end)
+}
+
+function getResources(s) {
+  switch(getSchool()) {
+    case('polymtl') :
+      return s.children[3].children[3].children
+    case('uqam') :
+      return s.children[2].children[1].children[0].children
+  }
 }
 
 function getCourseName() {
