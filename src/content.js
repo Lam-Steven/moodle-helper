@@ -12,14 +12,16 @@ chrome.runtime.onMessage.addListener(msg => {
         const resourcesArray = []
 
         Array.prototype.forEach.call(resources, resource => {
-          const anchorTag = resource.children[0].children[0].children[1].children[0].children[0]
-          const nameTag = anchorTag.children[1]
-          const iconTag = anchorTag.children[0]
-          resourcesArray.push({
-            iconUrl: iconTag.src,
-            url: isWindowOpen(anchorTag) ? getDownloadURL(anchorTag) : anchorTag.href,
-            name: nameTag.innerHTML
-          })
+          if (isActivityResource(resource)) {
+            const anchorTag = resource.children[0].children[0].children[1].children[0].children[0]
+            const nameTag = anchorTag.children[1]
+            const iconTag = anchorTag.children[0]
+            resourcesArray.push({
+              iconUrl: iconTag.src,
+              url: isWindowOpen(anchorTag) ? getDownloadURL(anchorTag) : anchorTag.href,
+              name: nameTag.innerHTML
+            })
+          }
         })
         allResources.push({
           section: s.getAttribute('aria-label'),
@@ -38,6 +40,11 @@ chrome.runtime.onMessage.addListener(msg => {
 function isHidden(s) {
   return s.getAttribute('class') == 'section main clearfix hidden'
 }
+
+function isActivityResource(r) {
+  return r.getAttribute('class').includes('activity resource')
+}
+
 function isWindowOpen(a) {
   return (
     a.hasAttribute('onclick') &&
