@@ -26,6 +26,7 @@ chrome.runtime.onMessage.addListener(msg => {
     document.body.appendChild(selectAllCheckbox)
     document.body.appendChild(selectAllCheckboxText)
     
+    const allResources = []
     const selectedRessources = [];
     msg.resources.forEach(r => {
       const section = document.createElement('H2')
@@ -33,6 +34,7 @@ chrome.runtime.onMessage.addListener(msg => {
       document.body.appendChild(section)
 
       r.resources.forEach(r => {
+        allResources.push(r)
         const icon = document.createElement('img')
         icon.src = r.iconUrl;
         icon.style.display = 'block'
@@ -81,7 +83,7 @@ chrome.runtime.onMessage.addListener(msg => {
       chrome.runtime.sendMessage({
         recipient: 'background',
         command: 'all',
-        resources: msg.resources,
+        resources: allResources,
         courseName: msg.courseName,
         extension: '',
       })
