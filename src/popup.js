@@ -4,6 +4,8 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
 
 chrome.runtime.onMessage.addListener(msg => {
   if (msg.recipient == 'popup') {
+    const types = [];
+
     const inputs = [];
     let counter = 0;
     const title = document.createElement('H1');
@@ -27,7 +29,7 @@ chrome.runtime.onMessage.addListener(msg => {
     document.body.appendChild(selectAllCheckboxText);
 
     const allResources = [];
-    const selectedRessources = [];
+    const selectedResources = [];
     msg.resources.forEach(r => {
       const section = document.createElement('H2');
       section.innerHTML = r.section;
@@ -49,14 +51,13 @@ chrome.runtime.onMessage.addListener(msg => {
         checkbox.addEventListener('change', function() {
           if (this.checked) {
             counter += 1;
-            selectedRessources.push(r);
+            selectedResources.push(r);
           } else {
             counter -= 1;
-            const index = selectedRessources.indexOf(r);
-            selectedRessources.splice(index, 1);
+            const index = selectedResources.indexOf(r);
+            selectedResources.splice(index, 1);
           }
           checkBoxCounter.innerHTML = 'Nombre de fichiers: ' + counter;
-          console.log(selectedRessources.length);
         });
         checkbox.setAttribute('type', 'checkbox');
         document.body.appendChild(checkbox);
@@ -97,7 +98,7 @@ chrome.runtime.onMessage.addListener(msg => {
       chrome.runtime.sendMessage({
         recipient: 'background',
         command: 'all',
-        resources: selectedRessources,
+        resources: selectedResources,
         courseName: msg.courseName,
         extension: '',
       });
