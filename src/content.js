@@ -66,9 +66,7 @@ function getDownloadURL(anchorTag) {
 }
 
 function getSchool() {
-  const schoolURL = document
-    .getElementsByTagName('link')[0]
-    .getAttribute('href');
+  const schoolURL = window.location.href;
   const end = schoolURL.indexOf('.ca');
   const start = schoolURL.lastIndexOf('.', end - 1) + 1;
   return schoolURL.substring(start, end);
