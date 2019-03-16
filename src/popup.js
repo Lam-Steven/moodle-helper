@@ -4,6 +4,8 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
 
 chrome.runtime.onMessage.addListener(msg => {
   if (msg.recipient == 'popup') {
+    const types = new Set();
+
     const inputs = [];
     let counter = 0;
     const title = document.createElement('H1');
@@ -11,7 +13,7 @@ chrome.runtime.onMessage.addListener(msg => {
     document.body.appendChild(title);
 
     const checkBoxCounter = document.createElement('H2');
-    checkBoxCounter.innerHTML = 'Nombre de fichiers: ' + counter;
+    checkBoxCounter.innerHTML = 'Number of files ' + counter;
     document.body.appendChild(checkBoxCounter);
 
     const selectAllCheckbox = document.createElement('INPUT');
@@ -26,8 +28,11 @@ chrome.runtime.onMessage.addListener(msg => {
     document.body.appendChild(selectAllCheckbox);
     document.body.appendChild(selectAllCheckboxText);
 
+    const filterDiv = document.createElement('DIV');
+    document.body.appendChild(filterDiv);
+
     const allResources = [];
-    const selectedRessources = [];
+    const selectedResources = [];
     msg.resources.forEach(r => {
       const section = document.createElement('H2');
       section.innerHTML = r.section;
@@ -37,6 +42,13 @@ chrome.runtime.onMessage.addListener(msg => {
         allResources.push(r);
         const icon = document.createElement('img');
         icon.src = r.iconUrl;
+        r.fileType = r.iconUrl
+          .split('/')
+          .pop()
+          .split('-')[0];
+
+        types.add(r.fileType);
+
         icon.style.display = 'block';
 
         const item = document.createElement('H4');
@@ -44,22 +56,21 @@ chrome.runtime.onMessage.addListener(msg => {
         item.appendChild(icon);
         document.body.appendChild(item);
 
-        const checkbox = document.createElement('INPUT');
-        inputs.push(checkbox);
-        checkbox.addEventListener('change', function() {
+        r.checkbox = document.createElement('INPUT');
+        inputs.push(r.checkbox);
+        r.checkbox.addEventListener('change', function() {
           if (this.checked) {
             counter += 1;
-            selectedRessources.push(r);
+            selectedResources.push(r);
           } else {
             counter -= 1;
-            const index = selectedRessources.indexOf(r);
-            selectedRessources.splice(index, 1);
+            const index = selectedResources.indexOf(r);
+            selectedResources.splice(index, 1);
           }
-          checkBoxCounter.innerHTML = 'Nombre de fichiers: ' + counter;
-          console.log(selectedRessources.length);
+          checkBoxCounter.innerHTML = 'Number of files ' + counter;
         });
-        checkbox.setAttribute('type', 'checkbox');
-        document.body.appendChild(checkbox);
+        r.checkbox.setAttribute('type', 'checkbox');
+        document.body.appendChild(r.checkbox);
 
         const button = document.createElement('BUTTON');
         button.innerHTML = 'download';
@@ -74,6 +85,18 @@ chrome.runtime.onMessage.addListener(msg => {
         });
         document.body.appendChild(button);
       });
+    });
+
+    types.forEach(type => {
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.addEventListener('change', function() {
+        selectByType(allResources, type, this.checked);
+      });
+      const label = document.createElement('label');
+      label.innerHTML = type + 's';
+      label.appendChild(checkbox);
+      filterDiv.appendChild(label);
     });
 
     const downloadAllButton = document.createElement('BUTTON');
@@ -97,7 +120,7 @@ chrome.runtime.onMessage.addListener(msg => {
       chrome.runtime.sendMessage({
         recipient: 'background',
         command: 'all',
-        resources: selectedRessources,
+        resources: selectedResources,
         courseName: msg.courseName,
         extension: '',
       });
@@ -113,6 +136,16 @@ function selectAllCheckboxes(inputs, isChecked) {
     if (element.checked != isChecked) {
       element.checked = isChecked;
       element.dispatchEvent(new Event('change'));
+    }
+  });
+}
+
+function selectByType(resources, type, isChecked) {
+  resources.forEach(resource => {
+    const checkbox = resource.checkbox;
+    if (resource.fileType == type && checkbox.checked != isChecked) {
+      checkbox.checked = isChecked;
+      checkbox.dispatchEvent(new Event('change'));
     }
   });
 }
