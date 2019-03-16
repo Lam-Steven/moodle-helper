@@ -4,7 +4,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
 
 chrome.runtime.onMessage.addListener(msg => {
   if (msg.recipient == 'popup') {
-    const types = [];
+    const types = new Set();
 
     const inputs = [];
     let counter = 0;
@@ -13,7 +13,7 @@ chrome.runtime.onMessage.addListener(msg => {
     document.body.appendChild(title);
 
     const checkBoxCounter = document.createElement('H2');
-    checkBoxCounter.innerHTML = 'Nombre de fichiers: ' + counter;
+    checkBoxCounter.innerHTML = 'Number of files' + counter;
     document.body.appendChild(checkBoxCounter);
 
     const selectAllCheckbox = document.createElement('INPUT');
@@ -39,6 +39,10 @@ chrome.runtime.onMessage.addListener(msg => {
         allResources.push(r);
         const icon = document.createElement('img');
         icon.src = r.iconUrl;
+        const type = r.iconUrl.split('/').pop();
+        types.add(type);
+
+        console.log(r.iconUrl);
         icon.style.display = 'block';
 
         const item = document.createElement('H4');
@@ -57,7 +61,7 @@ chrome.runtime.onMessage.addListener(msg => {
             const index = selectedResources.indexOf(r);
             selectedResources.splice(index, 1);
           }
-          checkBoxCounter.innerHTML = 'Nombre de fichiers: ' + counter;
+          checkBoxCounter.innerHTML = 'Number of files' + counter;
         });
         checkbox.setAttribute('type', 'checkbox');
         document.body.appendChild(checkbox);
@@ -76,6 +80,8 @@ chrome.runtime.onMessage.addListener(msg => {
         document.body.appendChild(button);
       });
     });
+
+    console.log(types);
 
     const downloadAllButton = document.createElement('BUTTON');
     downloadAllButton.innerHTML = 'download all';
