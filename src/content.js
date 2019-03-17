@@ -78,6 +78,8 @@ function getResources(s) {
       return s.children[3].children[3].children;
     case 'uqam':
       return s.children[2].children[1].children[0].children;
+    case 'umontreal':
+      return s.children[3].children[3].children;
   }
 }
 
@@ -90,6 +92,10 @@ function getCourseName() {
       break;
     case 'uqam':
       courseName = document.getElementsByClassName('titre-cours')[0].innerHTML;
+      break;
+    case 'umontreal':
+      courseName = document.getElementsByClassName('page-header-headings')[0]
+        .children[0].innerHTML;
       break;
   }
   return courseName.replace(ILLEGAL_CHARACTERS, '').trim();
