@@ -5,16 +5,17 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
 chrome.runtime.onMessage.addListener(msg => {
   if (msg.recipient == 'popup') {
     const types = new Set();
-
+    const headerDiv = document.getElementById('header');
+    const contentDiv = document.getElementById('content');
     const inputs = [];
     let counter = 0;
     const title = document.createElement('H1');
     title.innerHTML = msg.courseName;
-    document.body.appendChild(title);
+    headerDiv.appendChild(title);
 
     const checkBoxCounter = document.createElement('H2');
     checkBoxCounter.innerHTML = 'Number of files ' + counter;
-    document.body.appendChild(checkBoxCounter);
+    headerDiv.appendChild(checkBoxCounter);
 
     const selectAllCheckbox = document.createElement('INPUT');
     const selectAllCheckboxText = document.createElement('H2');
@@ -25,18 +26,18 @@ chrome.runtime.onMessage.addListener(msg => {
     });
 
     selectAllCheckbox.setAttribute('type', 'checkbox');
-    document.body.appendChild(selectAllCheckbox);
-    document.body.appendChild(selectAllCheckboxText);
+    headerDiv.appendChild(selectAllCheckbox);
+    headerDiv.appendChild(selectAllCheckboxText);
 
     const filterDiv = document.createElement('DIV');
-    document.body.appendChild(filterDiv);
+    headerDiv.appendChild(filterDiv);
 
     const allResources = [];
     const selectedResources = [];
     msg.resources.forEach(r => {
       const section = document.createElement('H2');
       section.innerHTML = r.section;
-      document.body.appendChild(section);
+      contentDiv.appendChild(section);
 
       r.resources.forEach(r => {
         allResources.push(r);
@@ -54,7 +55,7 @@ chrome.runtime.onMessage.addListener(msg => {
         const item = document.createElement('H4');
         item.innerHTML = r.name;
         item.appendChild(icon);
-        document.body.appendChild(item);
+        contentDiv.appendChild(item);
 
         r.checkbox = document.createElement('INPUT');
         inputs.push(r.checkbox);
@@ -70,7 +71,7 @@ chrome.runtime.onMessage.addListener(msg => {
           checkBoxCounter.innerHTML = 'Number of files ' + counter;
         });
         r.checkbox.setAttribute('type', 'checkbox');
-        document.body.appendChild(r.checkbox);
+        contentDiv.appendChild(r.checkbox);
 
         const button = document.createElement('BUTTON');
         button.innerHTML = 'download';
@@ -83,7 +84,7 @@ chrome.runtime.onMessage.addListener(msg => {
             extension: '',
           });
         });
-        document.body.appendChild(button);
+        contentDiv.appendChild(button);
       });
     });
 
@@ -110,9 +111,9 @@ chrome.runtime.onMessage.addListener(msg => {
         extension: '',
       });
     });
-    document.body.appendChild(document.createElement('br'));
-    document.body.appendChild(document.createElement('br'));
-    document.body.appendChild(downloadAllButton);
+    contentDiv.appendChild(document.createElement('br'));
+    contentDiv.appendChild(document.createElement('br'));
+    contentDiv.appendChild(downloadAllButton);
 
     const downloadSelectedButton = document.createElement('BUTTON');
     downloadSelectedButton.innerHTML = 'download selected';
@@ -126,8 +127,8 @@ chrome.runtime.onMessage.addListener(msg => {
       });
     });
 
-    document.body.appendChild(document.createElement('br'));
-    document.body.appendChild(downloadSelectedButton);
+    contentDiv.appendChild(document.createElement('br'));
+    contentDiv.appendChild(downloadSelectedButton);
   }
 });
 
