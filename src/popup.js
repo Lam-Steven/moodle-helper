@@ -5,35 +5,16 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
 chrome.runtime.onMessage.addListener(msg => {
   if (msg.recipient == 'popup') {
     const types = new Set();
-    const headerDiv = document.getElementById('header');
     const contentDiv = document.getElementById('content');
     const inputs = [];
     let counter = 0;
-    const title = document.createElement('H1');
-    title.innerHTML = msg.courseName;
-    headerDiv.appendChild(title);
+    const checkBoxCounter = document.createElement('P');
+    checkBoxCounter.innerHTML = 'Number of files : ' + counter;
 
-    const checkBoxCounter = document.createElement('H2');
-    checkBoxCounter.innerHTML = 'Number of files ' + counter;
-    headerDiv.appendChild(checkBoxCounter);
-
-    const selectAllCheckbox = document.createElement('INPUT');
-    const selectAllCheckboxText = document.createElement('H2');
-    selectAllCheckboxText.innerHTML = 'Check all';
-    selectAllCheckboxText.style.display = 'inline';
-    selectAllCheckbox.addEventListener('change', function() {
-      selectAllCheckboxes(inputs, this.checked);
-    });
-
-    selectAllCheckbox.setAttribute('type', 'checkbox');
-    headerDiv.appendChild(selectAllCheckbox);
-    headerDiv.appendChild(selectAllCheckboxText);
-
-    const filterDiv = document.createElement('DIV');
-    headerDiv.appendChild(filterDiv);
 
     const allResources = [];
     const selectedResources = [];
+
     msg.resources.forEach(r => {
       const section = document.createElement('H2');
       section.innerHTML = r.section;
@@ -68,7 +49,7 @@ chrome.runtime.onMessage.addListener(msg => {
             const index = selectedResources.indexOf(r);
             selectedResources.splice(index, 1);
           }
-          checkBoxCounter.innerHTML = 'Number of files ' + counter;
+          checkBoxCounter.innerHTML = 'Number of files : ' + counter;
         });
         r.checkbox.setAttribute('type', 'checkbox');
         contentDiv.appendChild(r.checkbox);
@@ -86,49 +67,10 @@ chrome.runtime.onMessage.addListener(msg => {
         });
         contentDiv.appendChild(button);
       });
+      
     });
+    createHeader(msg.courseName, checkBoxCounter, inputs, types, selectedResources, allResources)
 
-    types.forEach(type => {
-      const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      checkbox.addEventListener('change', function() {
-        selectByType(allResources, type, this.checked);
-      });
-      const label = document.createElement('label');
-      label.innerHTML = type + 's';
-      label.appendChild(checkbox);
-      filterDiv.appendChild(label);
-    });
-
-    const downloadAllButton = document.createElement('BUTTON');
-    downloadAllButton.innerHTML = 'download all';
-    downloadAllButton.addEventListener('click', () => {
-      chrome.runtime.sendMessage({
-        recipient: 'background',
-        command: 'all',
-        resources: allResources,
-        courseName: msg.courseName,
-        extension: '',
-      });
-    });
-    contentDiv.appendChild(document.createElement('br'));
-    contentDiv.appendChild(document.createElement('br'));
-    contentDiv.appendChild(downloadAllButton);
-
-    const downloadSelectedButton = document.createElement('BUTTON');
-    downloadSelectedButton.innerHTML = 'download selected';
-    downloadSelectedButton.addEventListener('click', () => {
-      chrome.runtime.sendMessage({
-        recipient: 'background',
-        command: 'all',
-        resources: selectedResources,
-        courseName: msg.courseName,
-        extension: '',
-      });
-    });
-
-    contentDiv.appendChild(document.createElement('br'));
-    contentDiv.appendChild(downloadSelectedButton);
   }
 });
 
@@ -149,4 +91,63 @@ function selectByType(resources, type, isChecked) {
       checkbox.dispatchEvent(new Event('change'));
     }
   });
+}
+
+function createHeader(course, checkBoxCounter, inputs, types, selectedResources, allResources) {
+  const headerDiv = document.getElementById('header');
+
+  const title = document.createElement('H1');
+  title.innerHTML = course;
+  headerDiv.appendChild(title);
+  
+  const selectAllCheckbox = document.createElement('INPUT');
+  const selectAllCheckboxText = document.createElement('H2');
+  selectAllCheckboxText.innerHTML = 'Check all';
+  selectAllCheckboxText.style.display = 'inline';
+  selectAllCheckbox.addEventListener('change', function() {
+    selectAllCheckboxes(inputs, this.checked);
+  });
+
+  selectAllCheckbox.setAttribute('type', 'checkbox');
+  headerDiv.appendChild(selectAllCheckbox);
+  headerDiv.appendChild(selectAllCheckboxText);
+
+  const filterDiv = document.createElement('DIV');
+  filterDiv.style.padding = '20px';
+  headerDiv.appendChild(filterDiv);
+
+  const filter = document.createElement('H3');
+  filter.innerHTML = 'Filter by: ';
+  filterDiv.appendChild(filter);
+  types.forEach(type => {
+
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.addEventListener('change', function() {
+      selectByType(allResources, type, this.checked);
+    });
+
+    const label = document.createElement('label');
+    label.innerHTML = type + 's';
+    label.prepend(checkbox);
+    label.style.display = 'block';
+    filterDiv.appendChild(label);
+  });
+
+
+  const downloadSelectedButton = document.createElement('BUTTON');
+  downloadSelectedButton.innerHTML = 'DOWNLOAD';
+  downloadSelectedButton.addEventListener('click', () => {
+    chrome.runtime.sendMessage({
+      recipient: 'background',
+      command: 'all',
+      resources: selectedResources,
+      courseName: course,
+      extension: '',
+    });
+  });
+  headerDiv.appendChild(document.createElement('br'));
+  headerDiv.appendChild(downloadSelectedButton);
+  headerDiv.appendChild(checkBoxCounter);
+
 }
