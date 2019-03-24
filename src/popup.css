@@ -1,0 +1,22 @@
+body {
+    width: 500px;
+    overflow-x: hidden; 
+    overflow-y: auto;
+}
+
+#header {
+    position: fixed;
+    width: 200px;
+    height: 800px;
+    display: inline-block;
+    background-color: #1a323d;
+    padding: 5px;
+    color: white;
+}
+
+#content {
+    margin-left: 200px;
+    width: 300px;
+    display: inline-block;
+    padding: 15px;
+}
