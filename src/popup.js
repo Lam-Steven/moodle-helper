@@ -134,8 +134,8 @@ function createHeader(course, checkBoxCounter, inputs, types, selectedResources,
     filterDiv.appendChild(label);
   });
 
-
   const downloadSelectedButton = document.createElement('BUTTON');
+  downloadSelectedButton.id = 'download';
   downloadSelectedButton.innerHTML = 'DOWNLOAD';
   downloadSelectedButton.addEventListener('click', () => {
     chrome.runtime.sendMessage({
