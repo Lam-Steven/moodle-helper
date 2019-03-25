@@ -26,8 +26,10 @@ body {
 }
 
 #download {
+    width: 150px;
     padding: 15px 15px;
     font-size: 15px;
+    font-weight: bolder;
     cursor: pointer;
     text-align: center;
     color: #1a323d;
