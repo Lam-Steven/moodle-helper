@@ -22,23 +22,12 @@ chrome.runtime.onMessage.addListener(msg => {
 
       r.resources.forEach(r => {
         allResources.push(r);
-        const icon = document.createElement('img');
-        icon.src = r.iconUrl;
-        r.fileType = r.iconUrl
-          .split('/')
-          .pop()
-          .split('-')[0];
-
-        types.add(r.fileType);
-
-        icon.style.display = 'block';
-
-        const item = document.createElement('H4');
-        item.innerHTML = r.name;
-        item.appendChild(icon);
-        contentDiv.appendChild(item);
+        const itemDiv = document.createElement('DIV');
+        itemDiv.style.display = 'block';
+        contentDiv.appendChild(itemDiv);
 
         r.checkbox = document.createElement('INPUT');
+        r.checkbox.style.display = 'inline';
         inputs.push(r.checkbox);
         r.checkbox.addEventListener('change', function() {
           if (this.checked) {
@@ -53,7 +42,24 @@ chrome.runtime.onMessage.addListener(msg => {
           setDownloadButton(downloadSelectedButton, counter);
         });
         r.checkbox.setAttribute('type', 'checkbox');
-        contentDiv.appendChild(r.checkbox);
+        itemDiv.appendChild(r.checkbox);
+
+        const icon = document.createElement('img');
+        icon.style.display = 'inline';
+
+        icon.src = r.iconUrl;
+        itemDiv.appendChild(icon);
+        r.fileType = r.iconUrl
+          .split('/')
+          .pop()
+          .split('-')[0];
+
+        types.add(r.fileType);
+
+        const name = document.createElement('H4');
+        name.innerHTML = r.name;
+        name.style.display = 'inline';
+        itemDiv.appendChild(name);
       });
     });
     initializeHeader(msg.courseName, inputs, types, selectedResources, allResources)
@@ -109,7 +115,7 @@ function getFilters(types, resources, filters){
 }
 
 function setDownloadButton(downloadButton, counter) {
-  if(counter == 0) {
+  if (counter == 0) {
     downloadButton.disabled = true;
     downloadButton.style.backgroundColor = '#cbdadb';
     downloadButton.style.cursor = 'default';
