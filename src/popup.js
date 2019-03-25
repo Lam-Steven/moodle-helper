@@ -9,7 +9,9 @@ chrome.runtime.onMessage.addListener(msg => {
     const allResources = [];
     const selectedResources = [];
     let counter = 0;
-    
+    const downloadSelectedButton = document.getElementById('download');
+    setDownloadButton(downloadSelectedButton, counter);
+
     const checkBoxCounter = document.getElementById('counter');
     const contentDiv = document.getElementById('content');
 
@@ -48,10 +50,11 @@ chrome.runtime.onMessage.addListener(msg => {
             selectedResources.splice(index, 1);
           }
           checkBoxCounter.innerHTML = 'Number of files : ' + counter;
+          setDownloadButton(downloadSelectedButton, counter);
         });
         r.checkbox.setAttribute('type', 'checkbox');
         contentDiv.appendChild(r.checkbox);
-
+        
         const button = document.createElement('BUTTON');
         button.innerHTML = 'download';
         button.addEventListener('click', () => {
@@ -65,7 +68,6 @@ chrome.runtime.onMessage.addListener(msg => {
         });
         contentDiv.appendChild(button);
       });
-      
     });
     initializeHeader(msg.courseName, inputs, types, selectedResources, allResources)
   }
@@ -99,7 +101,7 @@ function initializeHeader(courseName, inputs, types, selectedResources, allResou
   });
 
   getFilters(types, allResources, document.getElementById('filters'));
-  setDownloadButton(selectedResources, courseName);
+  onClickDownloadButton(selectedResources, courseName);
 }
 
 function getFilters(types, resources, filters){
@@ -119,7 +121,19 @@ function getFilters(types, resources, filters){
   });
 }
 
-function setDownloadButton(resources, courseName) {
+function setDownloadButton(downloadButton, counter) {
+  if(counter == 0) {
+    downloadButton.disabled = true;
+    downloadButton.style.backgroundColor = '#cbdadb';
+    downloadButton.style.cursor = 'default';
+
+  } else {
+    downloadButton.disabled = false;
+    downloadButton.style.backgroundColor = 'white';
+    downloadButton.style.cursor = 'pointer';
+  }
+}
+function onClickDownloadButton(resources, courseName) {
   const downloadSelectedButton = document.getElementById('download');
   downloadSelectedButton.addEventListener('click', () => {
     chrome.runtime.sendMessage({
