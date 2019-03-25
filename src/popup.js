@@ -67,7 +67,7 @@ chrome.runtime.onMessage.addListener(msg => {
       });
       
     });
-    populateHeader(msg.courseName, inputs, types, selectedResources, allResources)
+    initializeHeader(msg.courseName, inputs, types, selectedResources, allResources)
   }
 });
 
@@ -90,22 +90,24 @@ function selectByType(resources, type, isChecked) {
   });
 }
 
-function populateHeader(course, inputs, types, selectedResources, allResources) {
-  const title = document.getElementById('courseName');
-  title.innerHTML = course;
+function initializeHeader(courseName, inputs, types, selectedResources, allResources) {
   
-  const selectAllCheckbox = document.getElementById('selectAll');
-  selectAllCheckbox.addEventListener('change', function() {
+  document.getElementById('courseName').innerHTML = courseName;
+  
+  document.getElementById('selectAll').addEventListener('change', function() {
     selectAllCheckboxes(inputs, this.checked);
   });
 
-  const filterDiv = document.getElementById('filters');
+  getFilters(types, allResources, document.getElementById('filters'));
+  setDownloadButton(selectedResources, courseName);
+}
 
+function getFilters(types, resources, filters){
   types.forEach(type => {
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
     checkbox.addEventListener('change', function() {
-      selectByType(allResources, type, this.checked);
+      selectByType(resources, type, this.checked);
     });
 
     const label = document.createElement('label');
@@ -113,16 +115,18 @@ function populateHeader(course, inputs, types, selectedResources, allResources) 
     label.style.display = 'block';
 
     label.prepend(checkbox);
-    filterDiv.appendChild(label);
+    filters.appendChild(label);
   });
+}
 
+function setDownloadButton(resources, courseName) {
   const downloadSelectedButton = document.getElementById('download');
   downloadSelectedButton.addEventListener('click', () => {
     chrome.runtime.sendMessage({
       recipient: 'background',
       command: 'all',
-      resources: selectedResources,
-      courseName: course,
+      resources: resources,
+      courseName: courseName,
       extension: '',
     });
   });
