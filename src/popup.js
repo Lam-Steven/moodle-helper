@@ -54,19 +54,6 @@ chrome.runtime.onMessage.addListener(msg => {
         });
         r.checkbox.setAttribute('type', 'checkbox');
         contentDiv.appendChild(r.checkbox);
-        
-        const button = document.createElement('BUTTON');
-        button.innerHTML = 'download';
-        button.addEventListener('click', () => {
-          chrome.runtime.sendMessage({
-            recipient: 'background',
-            command: 'one',
-            resource: r,
-            courseName: msg.courseName,
-            extension: '',
-          });
-        });
-        contentDiv.appendChild(button);
       });
     });
     initializeHeader(msg.courseName, inputs, types, selectedResources, allResources)
