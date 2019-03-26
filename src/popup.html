@@ -1,16 +1,23 @@
 <!DOCTYPE html>
 
 <head>
-    <style> 
-        body {
-            min-width: 500px;
-            overflow-x: hidden; 
-            overflow-y: auto;
-        }
-    </style>
+    <link rel="stylesheet" href="popup.css">
 </head>
 
 <body>
+    <div id='header'>
+        <h1 id='courseName'></h1>
+        <h2 id='selectAllLabel'><input id='selectAll' type='checkbox'>Check All</h2>
+        <div id='filters'>
+            <h3>Filter by: </h3>
+        </div>
+        <br>
+        <div>
+            <button id='download'>DOWNLOAD</button>
+            <p id='counter'>Number of files : 0</p>
+        </div>
+    </div>
+    <div id='content'></div>
     <script src="popup.js"></script>
 </body>
 

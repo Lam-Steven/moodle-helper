@@ -5,58 +5,29 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
 chrome.runtime.onMessage.addListener(msg => {
   if (msg.recipient == 'popup') {
     const types = new Set();
-
     const inputs = [];
-    let counter = 0;
-    const title = document.createElement('H1');
-    title.innerHTML = msg.courseName;
-    document.body.appendChild(title);
-
-    const checkBoxCounter = document.createElement('H2');
-    checkBoxCounter.innerHTML = 'Number of files ' + counter;
-    document.body.appendChild(checkBoxCounter);
-
-    const selectAllCheckbox = document.createElement('INPUT');
-    const selectAllCheckboxText = document.createElement('H2');
-    selectAllCheckboxText.innerHTML = 'Check all';
-    selectAllCheckboxText.style.display = 'inline';
-    selectAllCheckbox.addEventListener('change', function() {
-      selectAllCheckboxes(inputs, this.checked);
-    });
-
-    selectAllCheckbox.setAttribute('type', 'checkbox');
-    document.body.appendChild(selectAllCheckbox);
-    document.body.appendChild(selectAllCheckboxText);
-
-    const filterDiv = document.createElement('DIV');
-    document.body.appendChild(filterDiv);
-
     const allResources = [];
     const selectedResources = [];
+    let counter = 0;
+    const downloadSelectedButton = document.getElementById('download');
+    setDownloadButton(downloadSelectedButton, counter);
+
+    const checkBoxCounter = document.getElementById('counter');
+    const contentDiv = document.getElementById('content');
+
     msg.resources.forEach(r => {
       const section = document.createElement('H2');
       section.innerHTML = r.section;
-      document.body.appendChild(section);
+      contentDiv.appendChild(section);
 
       r.resources.forEach(r => {
         allResources.push(r);
-        const icon = document.createElement('img');
-        icon.src = r.iconUrl;
-        r.fileType = r.iconUrl
-          .split('/')
-          .pop()
-          .split('-')[0];
-
-        types.add(r.fileType);
-
-        icon.style.display = 'block';
-
-        const item = document.createElement('H4');
-        item.innerHTML = r.name;
-        item.appendChild(icon);
-        document.body.appendChild(item);
+        const itemDiv = document.createElement('DIV');
+        itemDiv.style.display = 'block';
+        contentDiv.appendChild(itemDiv);
 
         r.checkbox = document.createElement('INPUT');
+        r.checkbox.style.display = 'inline';
         inputs.push(r.checkbox);
         r.checkbox.addEventListener('change', function() {
           if (this.checked) {
@@ -67,67 +38,31 @@ chrome.runtime.onMessage.addListener(msg => {
             const index = selectedResources.indexOf(r);
             selectedResources.splice(index, 1);
           }
-          checkBoxCounter.innerHTML = 'Number of files ' + counter;
+          checkBoxCounter.innerHTML = 'Number of files : ' + counter;
+          setDownloadButton(downloadSelectedButton, counter);
         });
         r.checkbox.setAttribute('type', 'checkbox');
-        document.body.appendChild(r.checkbox);
+        itemDiv.appendChild(r.checkbox);
 
-        const button = document.createElement('BUTTON');
-        button.innerHTML = 'download';
-        button.addEventListener('click', () => {
-          chrome.runtime.sendMessage({
-            recipient: 'background',
-            command: 'one',
-            resource: r,
-            courseName: msg.courseName,
-            extension: '',
-          });
-        });
-        document.body.appendChild(button);
+        const icon = document.createElement('img');
+        icon.style.display = 'inline';
+
+        icon.src = r.iconUrl;
+        itemDiv.appendChild(icon);
+        r.fileType = r.iconUrl
+          .split('/')
+          .pop()
+          .split('-')[0];
+
+        types.add(r.fileType);
+
+        const name = document.createElement('H4');
+        name.innerHTML = r.name;
+        name.style.display = 'inline';
+        itemDiv.appendChild(name);
       });
     });
-
-    types.forEach(type => {
-      const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      checkbox.addEventListener('change', function() {
-        selectByType(allResources, type, this.checked);
-      });
-      const label = document.createElement('label');
-      label.innerHTML = type + 's';
-      label.appendChild(checkbox);
-      filterDiv.appendChild(label);
-    });
-
-    const downloadAllButton = document.createElement('BUTTON');
-    downloadAllButton.innerHTML = 'download all';
-    downloadAllButton.addEventListener('click', () => {
-      chrome.runtime.sendMessage({
-        recipient: 'background',
-        command: 'all',
-        resources: allResources,
-        courseName: msg.courseName,
-        extension: '',
-      });
-    });
-    document.body.appendChild(document.createElement('br'));
-    document.body.appendChild(document.createElement('br'));
-    document.body.appendChild(downloadAllButton);
-
-    const downloadSelectedButton = document.createElement('BUTTON');
-    downloadSelectedButton.innerHTML = 'download selected';
-    downloadSelectedButton.addEventListener('click', () => {
-      chrome.runtime.sendMessage({
-        recipient: 'background',
-        command: 'all',
-        resources: selectedResources,
-        courseName: msg.courseName,
-        extension: '',
-      });
-    });
-
-    document.body.appendChild(document.createElement('br'));
-    document.body.appendChild(downloadSelectedButton);
+    initializeHeader(msg.courseName, inputs, types, selectedResources, allResources)
   }
 });
 
@@ -147,5 +82,59 @@ function selectByType(resources, type, isChecked) {
       checkbox.checked = isChecked;
       checkbox.dispatchEvent(new Event('change'));
     }
+  });
+}
+
+function initializeHeader(courseName, inputs, types, selectedResources, allResources) {
+  
+  document.getElementById('courseName').innerHTML = courseName;
+  
+  document.getElementById('selectAll').addEventListener('change', function() {
+    selectAllCheckboxes(inputs, this.checked);
+  });
+
+  getFilters(types, allResources, document.getElementById('filters'));
+  onClickDownloadButton(selectedResources, courseName);
+}
+
+function getFilters(types, resources, filters){
+  types.forEach(type => {
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.addEventListener('change', function() {
+      selectByType(resources, type, this.checked);
+    });
+
+    const label = document.createElement('label');
+    label.innerHTML = type + 's';
+    label.style.display = 'block';
+
+    label.prepend(checkbox);
+    filters.appendChild(label);
+  });
+}
+
+function setDownloadButton(downloadButton, counter) {
+  if (counter == 0) {
+    downloadButton.disabled = true;
+    downloadButton.style.backgroundColor = '#cbdadb';
+    downloadButton.style.cursor = 'default';
+
+  } else {
+    downloadButton.disabled = false;
+    downloadButton.style.backgroundColor = 'white';
+    downloadButton.style.cursor = 'pointer';
+  }
+}
+function onClickDownloadButton(resources, courseName) {
+  const downloadSelectedButton = document.getElementById('download');
+  downloadSelectedButton.addEventListener('click', () => {
+    chrome.runtime.sendMessage({
+      recipient: 'background',
+      command: 'all',
+      resources: resources,
+      courseName: courseName,
+      extension: '',
+    });
   });
 }
